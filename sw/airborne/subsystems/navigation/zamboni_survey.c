@@ -1,7 +1,6 @@
 #include "zamboni_survey.h"
 
 #include "subsystems/nav.h"
-#include "estimator.h"
 #include "autopilot.h"
 #include "generated/flight_plan.h"
 
@@ -25,7 +24,7 @@ float z_altitude;
 static variables, used for initial calculations
 **/
 // properties for the filightpattern
-float flight_angle, return_angle;
+float z_flight_angle, z_return_angle;
 float dx_sweep_width, dy_sweep_width;
 float dx_flightline, dy_flightline;
 float dx_flight_vec, dy_flight_vec;
@@ -85,13 +84,13 @@ bool_t init_zamboni_survey(uint8_t center_wp, uint8_t dir_wp, float sweep_length
   // if turning right leave circle before angle is reached, if turning left - leave after
   if (z_sweep_spacing>0) pre_leave_angle -= pre_leave_angle;
 
-  // calculate the flight_angle
+  // calculate the z_flight_angle
   dx_flight_wpts = x_wp_dir - x_wp_center;
   dy_flight_wpts = y_wp_dir - y_wp_center;
   if (dy_flight_wpts == 0) dy_flight_wpts = 0.01; // to avoid dividing by zero
-  flight_angle = 180*atan2(dx_flight_wpts, dy_flight_wpts)/M_PI;
-  return_angle = flight_angle + 180;
-  if (return_angle > 359) return_angle -= 360;
+  z_flight_angle = 180*atan2(dx_flight_wpts, dy_flight_wpts)/M_PI;
+  z_return_angle = z_flight_angle + 180;
+  if (z_return_angle > 359) z_return_angle -= 360;
   
   // calculate the flightline vector from start to end of one flightline, (delta x and delta y for one flightline)
   // (used later to move the flight pattern one flightline up for each round) 
@@ -163,7 +162,7 @@ bool_t zamboni_survey(void)
   //Turn from stage to return
   else if (z_stage == Z_TURN1) {
 	nav_circle_XY(x_turn_center1, y_turn_center1, turnradius1);
-    if (NavCourseCloseTo(return_angle+pre_leave_angle)){
+    if (NavCourseCloseTo(z_return_angle+pre_leave_angle)){
 		// && nav_approaching_xy(x_seg_end, y_seg_end, x_seg_start, y_seg_start, CARROT
       //calculate SEG-points for the next flyover
       x_seg_start = x_seg_start + dx_sweep_width;
@@ -196,7 +195,7 @@ bool_t zamboni_survey(void)
   //turn from stage to return
   else if (z_stage == Z_TURN2) {
     nav_circle_XY(x_turn_center2, y_turn_center2, turnradius2);
-    if (NavCourseCloseTo(flight_angle+pre_leave_angle)) {
+    if (NavCourseCloseTo(z_flight_angle+pre_leave_angle)) {
 	  //counter = counter + 1;
 	  z_stage = Z_SEG;
       nav_init_stage();

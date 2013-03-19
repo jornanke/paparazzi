@@ -271,7 +271,7 @@
     <subsystem name="imu" type="aspirin_v2.2"/>
     <subsystem name="ahrs" type="float_dcm"/>
     <subsystem name="gps" type="ublox"/>
-    <subsystem name="navigation"/>
+    <subsystem name="navigation" type="extra"/>
     <!-- <subsystem name="ins"/> -->
     <subsystem name="ins" type="alt_float"/>
   </firmware>
